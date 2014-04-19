@@ -1,3 +1,11 @@
+:: Summary:
+:: Free up space on a windows server 
+:: 
+:: Actions: 
+:: blow away - recycle bins, temp files, old install files, event logs, cold fusion logs
+:: compress  - old log files: backups, ftp, performance, website logs
+
+
 @ECHO ON 
 :: hit the usual temp files
 
