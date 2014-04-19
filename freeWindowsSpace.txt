@@ -1,0 +1,73 @@
+@ECHO ON 
+:: hit the usual temp files
+
+:: C
+cd c:\
+del /f /s /q c:\temp\*.*
+del /f /s /q c:\windows\temp\*.*
+del /f /s /q c:\daf\data\logs\syslogs\isa\*.log
+del /f /s /q "c:\windows\downloaded program files\*.*"
+del /f /s /q c:\evtlogs\*.*
+del /f /s /q c:\cfusionmx\logs\*.*
+
+:: "C:\users\*\AppData\Local\Temp\*"
+:: "C:\users\*\AppData\Local\Microsoft\Windows\Temporary Internet Files\*"
+
+wmic nteventlog where filename='application' cleareventlog  
+:: line space needed?  using " does not work.
+wmic nteventlog where filename='system' cleareventlog  
+wmic nteventlog where filename='security' cleareventlog  
+
+gzip -f9vr "c:\Program Files\DebugDiag\Logs\*.txt"
+gzip -f9vr "c:\windows\*.log"
+gzip -f9vr "c:\documents and settings\*.log"
+
+:: gzip -f9vr "C:\Documents and Settings\All Users\Application Data\Lumension\LMAgent\logs\eps-*.log"  doh dont work
+cd "C:\Documents and Settings\All Users\Application Data\Lumension\LMAgent\logs\"
+gzip -f9vr eps-*.log
+cd c:\
+
+:: blow away recycle bins
+rmdir /s /q %systemdrive%\$Recycle.bin
+rmdir /s /q %systemdrive%\Recycled
+rmdir /s /q %systemdrive%\Recycler
+rmdir /s /q %systemdrive%\tmp
+rmdir /s /q c:\windows\SoftwareDistribution
+rmdir /s /q c:\windows\ie7updates
+rmdir /s /q C:\windows\ServicePackFiles\i386
+
+:: E
+cd e:\
+rmdir /s /q e:\$Recycle.bin
+rmdir /s /q e:\RECYCLER
+rmdir /s /q e:\tmp
+
+:: check \extendedlogs
+gzip -f9vr e:\extendedlogs\*.log*
+for /f %i in ('dir /b e:\extendedlogs') do gzip -f9vr e:\extendedlogs\%i\*.log*
+:: remove old gzip balls 99 days old
+:: forfiles -p "e:\extendedlogs" -s -m *.gz -d 99 -c "cmd /c dir @path"
+:: squish performance logs
+gzip -f9vr e:\perflogs\*.blg*
+gzip -f9vr e:\perflogs\*.blg*
+for /f %i in ('dir /b e:\perflogs') do gzip -f9vr e:\perflogs\%i\*.blg*
+gzip -f9vr e:\inetpub\*.log*
+for /f %i in ('dir /b e:\inetpub\') do gzip -f9vr e:\inetpub\%i\*.log*
+gzip -f9vr e:\inetpub\logs\*.txt*
+for /f %i in ('dir /b e:\inetpub\logs') do gzip -f9vr e:\inetpub\logs\%i\*.txt*
+:: check ftp logs
+gzip -f9vr e:\FTPlog\*.log*
+for /f %i in ('dir /b e:\FTPlog') do gzip -f9vr e:\FTPlog\%i\*.log*
+:: backup - may effect commvault somehow?
+gzip -f9vr e:\backup\*.log*
+for /f %i in ('dir /b e:\backup') do gzip -f9vr e:\backup\%i\*.log*
+gzip -f9vr e:\backup\*.bak*
+for /f %i in ('dir /b e:\backup') do gzip -f9vr e:\backup\%i\*.bak*
+
+:: ideas to be tested.  current manual operation only
+:: http://thehub.melbourneit.com/sites/ES/_layouts/WordViewer.aspx?id=/sites/ES/QMS%20Library/ES_Disk%20Space%20Managment_Work%20Instructions.docx
+::diruse command on inetpub
+::driuse /m /, /* /q:100 /d \...\...\inetpub
+
+
+
